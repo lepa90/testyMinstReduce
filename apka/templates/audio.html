@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<body>
+  
+  <form action="/transcribe_audio/", id="audioForm" enctype="multipart/form-data", method="post">
+    
+    <input type="file" id="audioFile" name="audio_data" accept="audio/*">
+    
+
+ 
+    <input type="submit" value="Submit">
+  </form>
+  <button onclick="submitVideo()">przekonwertuj</button>
+  <button type="button" onclick="submitAudio2()">zredukuj</button>
+  <button id="downloadButton">Pobierz plik</button>
+  <p id="transcript"></p>
+  
+<script>
+
+function submitVideo() {
+  console.log('funckaj')
+  var fileInput = document.getElementById('audioFile');
+  var file = fileInput.files[0];
+  console.log(file)
+  var formData = new FormData();
+  formData.append('data', file);
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/upload_video/', true);
+  xhr.onreadystatechange = function() {
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      console.log(this.responseText);
+    }
+  }
+  xhr.send(formData);
+  
+}
+
+
+
+
+function submitAudio2() {
+  var fileInput = document.getElementById('audioFile');
+  var file = fileInput.files[0];
+  console.log(file)
+  var formData = new FormData();
+  formData.append('data', file);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/nor/', true);
+  xhr.onreadystatechange = function() {
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      console.log(this.responseText);
+    }
+  }
+  xhr.send(formData);
+}
+
+
+    // Pobierz przycisk
+var downloadButton = document.getElementById('downloadButton');
+
+// Dodaj zdarzenie kliknięcia do przycisku
+downloadButton.addEventListener('click', function() {
+    // Utwórz nowe żądanie
+  var request = new XMLHttpRequest();
+    // Otwórz żądanie GET do widoku download_file
+  request.open('GET', '/download_file/', true);
+    // Ustaw typ odpowiedzi na blob, abyśmy mogli otrzymać plik
+  request.responseType = 'blob';
+    // Gdy żądanie zostanie zakończone
+  request.onload = function() {
+        // Utwórz nowy obiekt URL dla odpowiedzi
+    var url = window.URL.createObjectURL(request.response);
+        // Utwórz tymczasowy link do pobrania
+    var tempLink = document.createElement('a');
+    tempLink.href = url;
+    tempLink.setAttribute('download', 'reduced_noise.wav');
+    tempLink.click();
+  };
+    // Wyślij żądanie
+  request.send();
+});
+
+function submitAudio3() {
+  var fileInput = document.getElementById('audioFile');
+  var file = fileInput.files[0];
+  if (!file) {
+    alert('Please select a file before submitting.');
+    return;
+  }
+  console.log(file)
+  var formData = new FormData();
+  formData.append('audio_data', file);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/transcribe_audio/', true);
+  xhr.onload = function() {
+    if (this.status === 200) {
+      var responseHTML =this.responseText;
+      console.log(responseHTML);
+      
+    }
+  }
+  xhr.send(formData);
+  
+}
+
+
+
+
+
+
+function submitAudio4() {
+  var formData = new FormData();
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      var mediaRecorder = new MediaRecorder(stream);
+      var chunks = [];
+
+      mediaRecorder.start();
+
+      mediaRecorder.ondataavailable = function(e) {
+        chunks.push(e.data);
+      }
+
+      mediaRecorder.onstop = function(e) {
+        var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+        chunks = [];
+        formData.append('audio_data2', blob);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/transcribe_audio_stream/', true);
+        xhr.onreadystatechange = function() {
+          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            var data = JSON.parse(this.responseText);
+            console.log(data.transcript);
+          }
+        }
+        xhr.send(formData);
+      }
+
+      // Stop recording after 5 seconds
+      setTimeout(() => { mediaRecorder.stop(); }, 5000);
+    })
+    .catch(err => { console.log(err); });
+}
+</script>
+
+</body>
+</html>

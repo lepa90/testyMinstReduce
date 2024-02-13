@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transkrypt</title>
+</head>
+<body>
+
+    <h1>Transkrypt</h1>
+    <p id="transcript"></p>
+    {{transcript}}
+    {{tokens}}
+    <script>
+        // Przykładowa wartość dla zmiennej transcript
+        var transcript = "{{ transcript }}";
+
+        // Przekształć wartość zmiennej transcript na JSON
+        var transcriptJson = JSON.stringify(transcript);
+
+        // Wyświetl wartość zmiennej transcript na stronie
+        document.getElementById('transcript').textContent = transcriptJson;
+    </script>
+</body>
+</html>

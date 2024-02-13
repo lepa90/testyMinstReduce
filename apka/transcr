@@ -1,0 +1,13 @@
+from views import transcribe_audio
+from apka import TwitterClient
+# Załóżmy, że 'transcript' to Twój transkrypt z sesji
+transcript = request.session['transcript']
+
+# Utwórz instancję swojej klasy, która zawiera metodę 'get_tweet_sentiment'
+# Załóżmy, że Twoja klasa nazywa się 'TwitterClient'
+client = TwitterClient()
+
+# Przekaż transkrypt do metody 'get_tweet_sentiment'
+sentiment = client.get_tweet_sentiment(transcript)
+
+print(sentiment)
